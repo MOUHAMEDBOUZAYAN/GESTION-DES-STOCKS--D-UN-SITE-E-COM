@@ -21,7 +21,7 @@ const App = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl text-center font-bold mb-4">Product Management</h1>
+            <h1 className="text-2xl text-center font-bold mb-4">PRODUCT MANAGMENT</h1>
             <ProductForm fetchProducts={fetchProducts} />
             <ProductList products={products} fetchProducts={fetchProducts} />
         </div>
