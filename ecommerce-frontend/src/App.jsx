@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import ProductForm from './components/ProductForm';
 import ProductList from './components/ProductList';
+
+import Navbar from './components/Navbar';
 
 const App = () => {
     const [products, setProducts] = useState([]);
@@ -11,7 +14,7 @@ const App = () => {
             const response = await axios.get('http://localhost:5000/api/products');
             setProducts(response.data);
         } catch (error) {
-            console.error(error);
+            console.error("Error fetching products:", error);
         }
     };
 
@@ -19,12 +22,21 @@ const App = () => {
         fetchProducts();
     }, []);
 
+    const addProduct = (newProduct) => {
+        setProducts((prevProducts) => [...prevProducts, newProduct]);
+    };
+
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl text-center font-bold mb-4">PRODUCT MANAGMENT</h1>
-            <ProductForm fetchProducts={fetchProducts} />
-            <ProductList products={products} fetchProducts={fetchProducts} />
-        </div>
+        <Router>
+            <div className="w-full mx-auto">
+                
+            <Navbar/>
+                <Routes>
+                    <Route path="/" element={<ProductForm/>}/>
+                    <Route path="/list" element={<ProductList/>}/>
+                </Routes>
+            </div>
+        </Router>
     );
 };
 

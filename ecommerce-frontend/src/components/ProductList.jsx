@@ -1,35 +1,68 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
 
-const ProductList = ({ products, fetchProducts }) => {
+
+const ProductList = ({ fetchProducts }) => {
+    const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [editingProduct, setEditingProduct] = useState(null);
-    const [formData, setFormData] = useState({ title: '', description: '', price: '', stock: '' });
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+        price: '',
+        stock: '', 
+    });
+    const [loading, setLoading] = useState(true);
+    const [successMessage, setSuccessMessage] = useState('');
 
-    const handleDelete = async (id) => {
-        try {
-            await axios.delete(`http://localhost:5000/api/products/${id}`);
-            fetchProducts();
-        } catch (error) {
-            console.error(error);
+    useEffect(() => {
+        const loadProducts = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get('http://localhost:5000/api/products');
+                setProducts(response.data);
+            } catch (error) {
+                console.error("Error fetching products:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadProducts();
+    }, []);
+
+    const handleDelete = async (_id) => {
+        if (window.confirm("Are you sure you want to delete this product?")) {
+            try {
+                await axios.delete(`http://localhost:5000/api/${_id}`);
+                fetchProducts(); // Refresh the product list
+            } catch (error) {
+                console.error("Error deleting product:", error);
+            }
         }
     };
 
     const handleEdit = (product) => {
         setEditingProduct(product);
-        setFormData({ title: product.title, description: product.description, price: product.price, stock: product.stock });
+        setFormData({
+            title: product.title,
+            description: product.description,
+            price: product.price,
+            stock: product.stock,
+        });
     };
 
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`http://localhost:5000/api/products/${editingProduct._id}`, formData);
-            fetchProducts();
+            await axios.put(`http://localhost:5000/api/${editingProduct._id}`, formData);
+            fetchProducts(); // Refresh the product list
+            setSuccessMessage('Product updated successfully!');
+            setTimeout(() => setSuccessMessage(''), 3000); // Clear message after 3 seconds
             setEditingProduct(null); // Close modal after updating
         } catch (error) {
-            console.error(error);
+            console.error("Error updating product:", error);
         }
     };
 
@@ -37,51 +70,76 @@ const ProductList = ({ products, fetchProducts }) => {
         product.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    if (loading) {
+        return <div className="text-center">Loading...</div>;
+    }
+
     return (
-        <div>
-            <h2 className="text-lg font-bold mb-4">PRODUCTS LISTE</h2>
+        <div className="max-w-4xl mx-auto p-6" id='list'>
+            <h1 className="text-2xl font-bold mb-4 text-center">Products List</h1>
             <input
                 type="text"
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="border p-2 mb-4 w-full"
+                className="border border-gray-300 rounded-md p-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-            <ul>
-                {filteredProducts.length > 0 ? (
-                    filteredProducts.map(product => (
-                        <li key={product._id} className="border p-2 mb-2 flex justify-between">
-                            <div>
-                                <h3 className="font-semibold">{product.title}</h3>
-                                <p>{product.description}</p>
-                                <p>Price: {product.price} $</p>
-                                <p>Stock: {product.stock}</p>
-                            </div>
-                            <div>
-                                <button 
-                                    onClick={() => handleEdit(product)} 
-                                    className="bg-yellow-500 text-white p-1 mr-2 flex items-center transition duration-300 ease-in-out hover:bg-yellow-600"
-                                >
-                                    <FontAwesomeIcon icon={faEdit} className="mr-1" />
-                                    Edit
-                                </button>
-                                <button 
-                                    onClick={() => handleDelete(product._id)} 
-                                    className="bg-red-500 text-white p-1 flex items-center transition duration-300 ease-in-out hover:bg-red-600"
-                                >
-                                    <FontAwesomeIcon icon={faTrash} className="mr-1" />
-                                    Delete
-                                </button>
-                            </div>
-                        </li>
-                    ))
-                ) : (
-                    <p>No products found.</p>
-                )}
-            </ul>
-
+            {successMessage && (
+                <div className="bg-green-200 text-green-800 p-2 mb-4 rounded">
+                    {successMessage}
+                </div>
+            )}
+            <table className="min-w-full bg-white border border-gray-300">
+                <thead>
+                    <tr className="border-b">
+                        <th className="py-2 px-4 text-left">Image</th>
+                        <th className="py-2 px-4 text-left">Title</th>
+                        <th className="py-2 px-4 text-left">Description</th>
+                        <th className="py-2 px-4 text-left">Price</th>
+                        <th className="py-2 px-4 text-left">Stock</th>
+                        <th className="py-2 px-4 text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {filteredProducts.length > 0 ? (
+                        filteredProducts.map((product) => (
+                            <tr key={product._id} className="border-b">
+                                <td className="py-2 px-4">
+                                    {product.image && (
+                                        <img src={`http://localhost:5000/${product.image}`} alt={product.title} className="w-16 h-16 object-cover" />
+                                    )}
+                                </td>
+                                <td className="py-2 px-4">{product.title}</td>
+                                <td className="py-2 px-4">{product.description}</td>
+                                <td className="py-2 px-4">${product.price}</td>
+                                <td className="py-2 px-4">{product.stock}</td>
+                                <td className="py-2 px-4 flex space-x-2">
+                                    <button 
+                                        onClick={() => handleEdit(product)} 
+                                        className="bg-yellow-500 text-white p-2 rounded-md shadow hover:bg-yellow-600 transition"
+                                    >
+                                        <FontAwesomeIcon icon={faEdit} className="mr-1" />
+                                        Edit
+                                    </button>
+                                    <button 
+                                        onClick={() => handleDelete(product._id)} 
+                                        className="bg-red-500 text-white p-2 rounded-md shadow hover:bg-red-600 transition"
+                                    >
+                                        <FontAwesomeIcon icon={faTrash} className="mr-1" />
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="6" className="text-center py-4">No products found.</td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
             {editingProduct && (
-                <div className="mt-4 p-4 border">
+                <div className="mt-4 p-4 border rounded-md shadow">
                     <h3 className="font-semibold">Edit Product</h3>
                     <form onSubmit={handleUpdate}>
                         <input
@@ -115,8 +173,8 @@ const ProductList = ({ products, fetchProducts }) => {
                             className="border p-2 mb-2 w-full"
                             required
                         />
-                        <button type="submit" className="bg-blue-500 text-white p-1">Update Product</button>
-                        <button type="button" onClick={() => setEditingProduct(null)} className="bg-gray-500 text-white p-1 ml-2">Cancel</button>
+                        <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">Update Product</button>
+                        <button type="button" onClick={() => setEditingProduct(null)} className="bg-gray-500 text-white p-2 rounded-md ml-2">Cancel</button>
                     </form>
                 </div>
             )}
