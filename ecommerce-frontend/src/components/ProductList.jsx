@@ -3,7 +3,6 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
 
-
 const ProductList = ({ fetchProducts }) => {
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -75,109 +74,111 @@ const ProductList = ({ fetchProducts }) => {
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-6" id='list'>
-            <h1 className="text-2xl font-bold mb-4 text-center">Products List</h1>
-            <input
-                type="text"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="border border-gray-300 rounded-md p-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-            {successMessage && (
-                <div className="bg-green-200 text-green-800 p-2 mb-4 rounded">
-                    {successMessage}
-                </div>
-            )}
-            <table className="min-w-full bg-white border border-gray-300">
-                <thead>
-                    <tr className="border-b">
-                        <th className="py-2 px-4 text-left">Image</th>
-                        <th className="py-2 px-4 text-left">Title</th>
-                        <th className="py-2 px-4 text-left">Description</th>
-                        <th className="py-2 px-4 text-left">Price</th>
-                        <th className="py-2 px-4 text-left">Stock</th>
-                        <th className="py-2 px-4 text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredProducts.length > 0 ? (
-                        filteredProducts.map((product) => (
-                            <tr key={product._id} className="border-b">
-                                <td className="py-2 px-4">
-                                    {product.image && (
-                                        <img src={`http://localhost:5000/${product.image}`} alt={product.title} className="w-16 h-16 object-cover" />
-                                    )}
-                                </td>
-                                <td className="py-2 px-4">{product.title}</td>
-                                <td className="py-2 px-4">{product.description}</td>
-                                <td className="py-2 px-4">${product.price}</td>
-                                <td className="py-2 px-4">{product.stock}</td>
-                                <td className="py-2 px-4 flex space-x-2">
-                                    <button 
-                                        onClick={() => handleEdit(product)} 
-                                        className="bg-yellow-500 text-white p-2 rounded-md shadow hover:bg-yellow-600 transition"
-                                    >
-                                        <FontAwesomeIcon icon={faEdit} className="mr-1" />
-                                        Edit
-                                    </button>
-                                    <button 
-                                        onClick={() => handleDelete(product._id)} 
-                                        className="bg-red-500 text-white p-2 rounded-md shadow hover:bg-red-600 transition"
-                                    >
-                                        <FontAwesomeIcon icon={faTrash} className="mr-1" />
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="6" className="text-center py-4">No products found.</td>
+        <div className="bg-gray-600 min-h-screen p-6" id='list'>
+            <div className="max-w-4xl mx-auto bg-gray-800 shadow-lg rounded-lg p-6">
+                <h1 className="text-2xl font-bold mb-4 text-white text-center">Products List</h1>
+                <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="border border-gray-300 rounded-md p-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                {successMessage && (
+                    <div className="bg-green-200 text-green-800 p-2 mb-4 rounded">
+                        {successMessage}
+                    </div>
+                )}
+                <table className="min-w-full bg-white border border-gray-300 shadow-md">
+                    <thead>
+                        <tr className="bg-gray-600 border-b">
+                            <th className="py-2 px-4 text-left text-white">Image</th>
+                            <th className="py-2 px-4 text-left text-white">Title</th>
+                            <th className="py-2 px-4 text-left text-white">Description</th>
+                            <th className="py-2 px-4 text-left text-white">Price</th>
+                            <th className="py-2 px-4 text-left text-white">Stock</th>
+                            <th className="py-2 px-4 text-left text-white">Actions</th>
                         </tr>
-                    )}
-                </tbody>
-            </table>
-            {editingProduct && (
-                <div className="mt-4 p-4 border rounded-md shadow">
-                    <h3 className="font-semibold">Edit Product</h3>
-                    <form onSubmit={handleUpdate}>
-                        <input
-                            type="text"
-                            placeholder="Title"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            className="border p-2 mb-2 w-full"
-                            required
-                        />
-                        <textarea
-                            placeholder="Description"
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="border p-2 mb-2 w-full"
-                            required
-                        />
-                        <input
-                            type="number"
-                            placeholder="Price"
-                            value={formData.price}
-                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                            className="border p-2 mb-2 w-full"
-                            required
-                        />
-                        <input
-                            type="number"
-                            placeholder="Stock"
-                            value={formData.stock}
-                            onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                            className="border p-2 mb-2 w-full"
-                            required
-                        />
-                        <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">Update Product</button>
-                        <button type="button" onClick={() => setEditingProduct(null)} className="bg-gray-500 text-white p-2 rounded-md ml-2">Cancel</button>
-                    </form>
-                </div>
-            )}
+                    </thead>
+                    <tbody>
+                        {filteredProducts.length > 0 ? (
+                            filteredProducts.map((product) => (
+                                <tr key={product._id} className="border-b hover:bg-gray-50">
+                                    <td className="py-2 px-4">
+                                        {product.image && (
+                                            <img src={`http://localhost:5000/${product.image}`} alt={product.title} className="w-16 h-16 object-cover" />
+                                        )}
+                                    </td>
+                                    <td className="py-2 px-4">{product.title}</td>
+                                    <td className="py-2 px-4">{product.description}</td>
+                                    <td className="py-2 px-4">${product.price}</td>
+                                    <td className="py-2 px-4">{product.stock}</td>
+                                    <td className="py-2 px-4 flex space-x-2">
+                                        <button 
+                                            onClick={() => handleEdit(product)} 
+                                            className="bg-yellow-500 text-white p-2 rounded-md shadow hover:bg-yellow-600 transition"
+                                        >
+                                            <FontAwesomeIcon icon={faEdit} className="mr-1" />
+                                            Edit
+                                        </button>
+                                        <button 
+                                            onClick={() => handleDelete(product._id)} 
+                                            className="bg-red-500 text-white p-2 rounded-md shadow hover:bg-red-600 transition"
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} className="mr-1" />
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="6" className="text-center py-4">No products found.</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+                {editingProduct && (
+                    <div className="mt-4 p-4 bg-teal-900 border rounded-md shadow">
+                        <h3 className="text-center text-2xl pb-5 font-semibold text-white">EDITE PRODUCT</h3>
+                        <form onSubmit={handleUpdate}>
+                            <input
+                                type="text"
+                                placeholder="Title"
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                className="border p-2 mb-2 w-full bg-gray-800 text-white"
+                                required
+                            />
+                            <textarea
+                                placeholder="Description"
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                className="border p-2 mb-2 w-full bg-gray-800 text-white"
+                                required
+                            />
+                            <input
+                                type="number"
+                                placeholder="Price"
+                                value={formData.price}
+                                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                className="border p-2 mb-2 w-full bg-gray-800 text-white"
+                                required
+                            />
+                            <input
+                                type="number"
+                                placeholder="Stock"
+                                value={formData.stock}
+                                onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                                className="border p-2 mb-2 w-full bg-gray-800 text-white"
+                                required
+                            />
+                            <button type="submit" onClick={()=> handleUpdate() } className="bg-blue-500 text-white p-2 rounded-md">Update Product</button>
+                            <button type="button" onClick={() => setEditingProduct(null)} className="bg-gray-500 text-white p-2 rounded-md ml-2">Cancel</button>
+                        </form>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

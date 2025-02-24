@@ -35,6 +35,7 @@ const ProductForm = () => {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
+            // Assuming onSubmit is a prop function passed to this component
             onSubmit(response.data.product);
             setProduct({ title: "", description: "", price: 0, stock: 0 });
             setImage(null);
@@ -46,63 +47,65 @@ const ProductForm = () => {
     };
 
     return (
-        <div className="max-w-md mt-10 mx-auto p-6 bg-gray-900 shadow-lg rounded-lg">
-            <h2 className="text-2xl font-bold mb-4 text-white text-center">Add New Product</h2>
-            {error && <div className="text-red-500 mb-4">{error}</div>}
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <input 
-                    type="text" 
-                    name="title" 
-                    placeholder="Product Title" 
-                    value={product.title} 
-                    onChange={handleChange} 
-                    required 
-                    className="border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400 bg-gray-800 text-white" 
-                />
-                <textarea 
-                    name="description" 
-                    placeholder="Product Description" 
-                    value={product.description} 
-                    onChange={handleChange} 
-                    required 
-                    className="border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400 bg-gray-800 text-white" 
-                />
-                <input 
-                    type="number" 
-                    name="price" 
-                    placeholder="Price ($)" 
-                    value={product.price} 
-                    onChange={handleChange} 
-                    required 
-                    className="border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400 bg-gray-800 text-white" 
-                />
-                <input 
-                    type="number" 
-                    name="stock" 
-                    placeholder="Stock Quantity" 
-                    value={product.stock} 
-                    onChange={handleChange} 
-                    required 
-                    className="border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-400 bg-gray-800 text-white" 
-                />
-                <div className="border p-4 rounded-md bg-gray-800">
-                    <label className="block font-medium text-gray-300">Upload Image</label>
+        <div className="bg-gray-700 min-h-screen flex items-center justify-center">
+            <div className="max-w-md p-6 bg-gray-800 shadow-xl rounded-lg">
+                <h2 className="text-2xl font-bold mb-4 text-white text-center">Add New Product</h2>
+                {error && <div className="text-red-500 mb-4">{error}</div>}
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <input 
-                        type="file" 
-                        name="image" 
-                        accept="image/*" 
-                        onChange={handleImageChange} 
-                        className="mt-2" 
+                        type="text" 
+                        name="title" 
+                        placeholder="Product Title" 
+                        value={product.title} 
+                        onChange={handleChange} 
+                        required 
+                        className="border border-gray-600 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white" 
                     />
-                </div>
-                {image && <img src={URL.createObjectURL(image)} alt="Preview" className="mt-2 h-32 w-32 object-cover" />}
-                <button 
-                    type="submit" 
-                    disabled={loading} 
-                    className={`w-full ${loading ? 'bg-gray-400' : 'bg-blue-600'} text-white font-semibold py-2 rounded-md shadow hover:bg-blue-700 transition duration-200`}>
-                    {loading ? 'Adding...' : 'Add Product'}
-                </button>
-            </form>
+                    <textarea 
+                        name="description" 
+                        placeholder="Product Description" 
+                        value={product.description} 
+                        onChange={handleChange} 
+                        required 
+                        className="border border-gray-600 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white" 
+                    />
+                    <input 
+                        type="number" 
+                        name="price" 
+                        placeholder="Price ($)" 
+                        value={product.price} 
+                        onChange={handleChange} 
+                        required 
+                        className="border border-gray-600 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white" 
+                    />
+                    <input 
+                        type="number" 
+                        name="stock" 
+                        placeholder="Stock Quantity" 
+                        value={product.stock} 
+                        onChange={handleChange} 
+                        required 
+                        className="border border-gray-600 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white" 
+                    />
+                    <div className="border border-gray-600 p-4 rounded-md bg-gray-700">
+                        <label className="block font-medium text-gray-300">Upload Image</label>
+                        <input 
+                            type="file" 
+                            name="image" 
+                            accept="image/*" 
+                            onChange={handleImageChange} 
+                            className="mt-2" 
+                        />
+                    </div>
+                    {image && <img src={URL.createObjectURL(image)} alt="Preview" className="mt-2 h-32 w-32 object-cover" />}
+                    <button 
+                        type="submit" 
+                        disabled={loading} 
+                        className={`w-full ${loading ? 'bg-gray-400' : 'bg-blue-600'} text-white font-semibold py-2 rounded-md shadow-lg hover:bg-blue-700 transition duration-200`}>
+                        {loading ? 'Adding...' : 'Add Product'}
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };
